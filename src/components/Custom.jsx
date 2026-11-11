@@ -50,7 +50,7 @@ export default function Custom() {
     const v = viewer.current
     if (v?.loaded) {
       setLook(v, mixLook(CLAY_LOOK, MODEL_LOOK, t))
-      orbitTo(v, turn * 360)
+      orbitTo(v, -turn * 360)
     }
     el?.style.setProperty('--mv', mv.toFixed(3))
     el?.style.setProperty('--t', t.toFixed(3))
