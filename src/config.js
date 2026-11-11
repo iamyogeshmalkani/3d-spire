@@ -12,10 +12,36 @@ export const CATALOGUE_LINK = waLink(
 )
 export const INSTAGRAM_LINK = 'https://www.instagram.com/3d_spire'
 
+const asset = (file) => `${import.meta.env.BASE_URL}${file}`
+
 // Served from /public, so it must respect Vite's base path.
-export const MODEL_URL = `${import.meta.env.BASE_URL}shiva-drinking-poison.glb`
+export const MODEL_URL = asset('shiva-drinking-poison.glb')
 // 2D reference shown as the "idea" stage before the sculpt fades in.
-export const IDEA_IMAGE_URL = `${import.meta.env.BASE_URL}idea-reference.jpg`
+export const IDEA_IMAGE_URL = asset('idea-reference.jpg')
+
+// Ready-made collection shown on the site (compressed GLBs in /public).
+export const COLLECTION = [
+  {
+    id: 'shiva-drinking-poison',
+    name: 'Shiva drinking poison',
+    src: asset('shiva-drinking-poison.glb'),
+  },
+  {
+    id: 'hanuman-body',
+    name: 'Hanuman',
+    src: asset('hanuman-body.glb'),
+  },
+  {
+    id: 'narsingh',
+    name: 'Narsingh',
+    src: asset('narsingh.glb'),
+  },
+  {
+    id: 'neem-karoli-baba',
+    name: 'Neem Karoli Baba',
+    src: asset('neem-karoli-baba.glb'),
+  },
+]
 
 // Lighting + material so the sculpt's form reads clearly on the dark background.
 // The source .glb is a single flat light-grey material, which blows out to pure white

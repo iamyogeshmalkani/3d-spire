@@ -1,6 +1,5 @@
 import ModelViewer from './ModelViewer.jsx'
-import Wireframe from './Wireframe.jsx'
-import { CATALOGUE_LINK, MODEL_URL } from '../config.js'
+import { CATALOGUE_LINK, COLLECTION } from '../config.js'
 
 export default function Collection() {
   return (
@@ -10,20 +9,23 @@ export default function Collection() {
         <h2 id="collection-title" className="h2 h2-lg">Ready to print. Made to be admired.</h2>
       </div>
       <div className="cards">
-        <article className="card card-model" data-reveal="clip">
-          <ModelViewer className="card-viewer" src={MODEL_URL} alt="Shiva drinking poison. Drag to rotate." />
-          <div className="card-caption">Model 01 · Shiva drinking poison</div>
-        </article>
-        <article className="card card-soon" data-reveal="clip" style={{ '--d': '0.12s' }}>
-          <Wireframe seed={0} />
-          <span className="card-tag">Coming soon</span>
-          <div className="card-caption">Model 02 · [Name]</div>
-        </article>
-        <article className="card card-soon" data-reveal="clip" style={{ '--d': '0.24s' }}>
-          <Wireframe seed={1} />
-          <span className="card-tag">Coming soon</span>
-          <div className="card-caption">Model 03 · [Name]</div>
-        </article>
+        {COLLECTION.map((model, i) => (
+          <article
+            key={model.id}
+            className="card card-model"
+            data-reveal="clip"
+            style={i ? { '--d': `${(i * 0.1).toFixed(2)}s` } : undefined}
+          >
+            <ModelViewer
+              className="card-viewer"
+              src={model.src}
+              alt={`${model.name}. Drag to rotate.`}
+            />
+            <div className="card-caption">
+              Model {String(i + 1).padStart(2, '0')} · {model.name}
+            </div>
+          </article>
+        ))}
       </div>
       <div className="collection-foot" data-reveal>
         <p className="muted note">Price depends on the model’s complexity.</p>
