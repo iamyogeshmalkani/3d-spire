@@ -320,10 +320,10 @@ html:not(.motion) .ticker-list li:last-child::after { display: none; }
 
 /* ---------- custom commissions: idea -> clay -> final ---------- */
 :root { --custom-min: 760px; }
-/* Taller pin = more scroll distance so idea → 3D eases in instead of snapping. */
-@media (min-width: 900px) and (prefers-reduced-motion: no-preference) { :root { --custom-min: 460vh; } }
+/* Tall pin so the sculpt can finish one full scroll-driven turn before the section ends. */
+@media (min-width: 900px) and (prefers-reduced-motion: no-preference) { :root { --custom-min: 640vh; } }
 .custom { position: relative; }
-.custom.is-pinned { height: 460vh; }
+.custom.is-pinned { height: 640vh; }
 .custom-sticky { padding-top: var(--section-pad, clamp(100px, 12vw, 170px)); }
 .custom.is-pinned .custom-sticky { position: sticky; top: 0; min-height: 100svh; display: flex; align-items: center; padding: calc(var(--nav-h) + 16px) 0 32px; }
 .custom-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 36px; align-items: center; width: 100%; }

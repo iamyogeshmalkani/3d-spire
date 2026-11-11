@@ -12,22 +12,23 @@ const STAGES = [
 
 // Progress keys along the pinned section (0..1):
 // [idea→model fade start, fade end, clay→final start, clay→final end].
-// Kept wide so the 3D model eases in slowly instead of snapping on.
+// Idea fades in earlier so most of the long pin is spent turning the sculpt once.
 const KEYS = {
-  pin: [0.18, 0.55, 0.58, 0.9],
-  view: [0.18, 0.48, 0.5, 0.78],
+  pin: [0.1, 0.28, 0.52, 0.86],
+  view: [0.14, 0.38, 0.48, 0.78],
 }
+// Full 360° is mapped across this window (after the model is mostly visible → near end).
+const TURN = { pin: [0.26, 0.9], view: [0.32, 0.88] }
 
-const valuesFor = (p, keys) => {
+const valuesFor = (p, keys, turnKeys) => {
   const mv = smoothstep(keys[0], keys[1], p) // 0 = idea image, 1 = model visible
   const t = smoothstep(keys[2], keys[3], p) // 0 = clay, 1 = finished stone
-  // Exactly one full turn while the model is on screen (fade-in start → section end).
-  const turn = Math.min(1, Math.max(0, (p - keys[0]) / (1 - keys[0])))
+  const turn = Math.min(1, Math.max(0, (p - turnKeys[0]) / (turnKeys[1] - turnKeys[0])))
   return { mv, t, turn, stage: mv < 0.45 ? 'idea' : t < 0.45 ? 'clay' : 'final' }
 }
 const PRESET = {
   idea: { mv: 0, t: 0, turn: 0 },
-  clay: { mv: 1, t: 0, turn: 0.45 },
+  clay: { mv: 1, t: 0, turn: 0.4 },
   final: { mv: 1, t: 1, turn: 1 },
 }
 
@@ -59,7 +60,8 @@ export default function Custom() {
 
   const ref = useScrollProgress(pinned ? 'pin' : 'view', (p, el) => {
     if (manual.current) return
-    const next = valuesFor(p, pinned ? KEYS.pin : KEYS.view)
+    const mode = pinned ? 'pin' : 'view'
+    const next = valuesFor(p, KEYS[mode], TURN[mode])
     paint(el, next)
     if (el.dataset.stage !== next.stage) {
       el.dataset.stage = next.stage
@@ -80,7 +82,7 @@ export default function Custom() {
       const el = ref.current
       const travel = el.offsetHeight - window.innerHeight
       const top = el.getBoundingClientRect().top + window.scrollY
-      const at = { idea: 0.08, clay: 0.56, final: 0.94 }[key]
+      const at = { idea: 0.05, clay: 0.5, final: 0.94 }[key]
       window.scrollTo({ top: top + travel * at, behavior: 'smooth' })
       return
     }
