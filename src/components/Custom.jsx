@@ -135,8 +135,8 @@ export default function Custom() {
                 <img
                   src={IDEA_IMAGE_URL}
                   alt=""
-                  width="505"
-                  height="900"
+                  width="933"
+                  height="1400"
                   decoding="async"
                   fetchPriority="low"
                 />

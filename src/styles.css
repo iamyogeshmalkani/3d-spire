@@ -295,7 +295,7 @@ html:not(.motion) .ticker-list li:last-child::after { display: none; }
 .idea-frame {
   position: relative;
   width: min(72%, 360px);
-  aspect-ratio: 505 / 900;
+  aspect-ratio: 933 / 1400;
   margin: 0;
   border-radius: 18px;
   overflow: hidden;
@@ -311,7 +311,7 @@ html:not(.motion) .ticker-list li:last-child::after { display: none; }
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 18%;
+  object-position: center top;
 }
 .idea-caption {
   position: absolute;
