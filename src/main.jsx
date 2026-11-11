@@ -3,10 +3,14 @@ import { createRoot } from 'react-dom/client'
 import './styles.css'
 import App from './App.jsx'
 import { reducedMotion } from './motion.js'
+import { loadViewer } from './components/ModelViewer.jsx'
 
 // Entrance/scroll animations are opt-in via this class, so with JS disabled or
 // prefers-reduced-motion set, every element renders in its final, visible state.
 if (!reducedMotion()) document.documentElement.classList.add('motion')
+
+// Kick off the model-viewer chunk immediately so the hero doesn't wait on React paint.
+loadViewer()
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

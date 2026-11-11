@@ -1,23 +1,12 @@
-import { useRef } from 'react'
-import ModelViewer, { orbitBy } from './ModelViewer.jsx'
 import { MODEL_URL, QUOTE_LINK } from '../config.js'
-import { useScrollProgress } from '../hooks.js'
+import ModelViewer from './ModelViewer.jsx'
 
 const TITLE = ['Any idea.', 'Any reference.', 'Sculpted in 3D.']
 
-// The hero is a stage: the sculpt stands free of any box on a lime spotlight, in front of
-// an oversized ghost wordmark. Layers move at different speeds on scroll (via --p) and the
-// camera turns around the figure as you scroll past it.
+// Hero stage: auto-rotating sculpt, no drag controls — faster to load and doesn't fight scroll.
 export default function Hero() {
-  const viewer = useRef(null)
-  const lastP = useRef(0)
-  const ref = useScrollProgress('exit', (p) => {
-    orbitBy(viewer.current, (p - lastP.current) * 150)
-    lastP.current = p
-  })
-
   return (
-    <section id="top" ref={ref} className="hero" aria-labelledby="hero-title">
+    <section id="top" className="hero" aria-labelledby="hero-title">
       <div className="hero-ghost" aria-hidden="true">SPIRE</div>
       <div className="container hero-grid">
         <div className="hero-copy">
@@ -45,10 +34,12 @@ export default function Hero() {
             eager
             className="viewer-hero"
             src={MODEL_URL}
-            alt="Interactive 3D sculpt by 3D Spire. Drag to rotate."
-            onViewer={(el) => (viewer.current = el)}
+            alt="3D sculpt by 3D Spire, slowly rotating."
+            controls={false}
+            autoRotate
+            interactionPrompt="none"
+            autoRotateDelay={0}
           />
-          <p className="hint">Drag to rotate</p>
         </div>
 
         <div className="scroll-cue" aria-hidden="true">

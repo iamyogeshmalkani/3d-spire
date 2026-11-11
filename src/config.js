@@ -20,7 +20,7 @@ export const IDEA_IMAGE_URL = `${import.meta.env.BASE_URL}idea-reference.jpg`
 // Lighting + material so the sculpt's form reads clearly on the dark background.
 // The source .glb is a single flat light-grey material, which blows out to pure white
 // under even lighting, so we use a directional studio light map and a mid-tone surface.
-export const ENVIRONMENT_URL = `${import.meta.env.BASE_URL}studio.png`
+export const ENVIRONMENT_URL = `${import.meta.env.BASE_URL}studio.jpg`
 export const MODEL_LOOK = {
   baseColor: [0.56, 0.54, 0.5, 1], // warm stone grey
   roughness: 0.42,

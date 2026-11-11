@@ -6,7 +6,7 @@ import Wireframe from './Wireframe.jsx'
 
 let viewerLoad
 // Loads the <model-viewer> web component (and three.js) as a separate chunk, only once.
-const loadViewer = () => (viewerLoad ??= import('@google/model-viewer'))
+export const loadViewer = () => (viewerLoad ??= import('@google/model-viewer'))
 
 // Re-skin the model (the .glb ships with one plain light-grey material). Safe to call at
 // any time: before the model has loaded it is applied on the `load` event.
@@ -52,6 +52,8 @@ export default function ModelViewer({
   className = '',
   look = MODEL_LOOK,
   autoRotate = true,
+  autoRotateDelay = 1500,
+  controls = true,
   interactionPrompt = 'auto',
   // 0 = snap camera orbit to scroll (no easing lag). Leave unset for default feel.
   interpolationDecay,
@@ -89,6 +91,7 @@ export default function ModelViewer({
   )
 
   const rotate = autoRotate ? { 'auto-rotate': '' } : {}
+  const cam = controls ? { 'camera-controls': '', 'disable-zoom': '' } : {}
   const decay =
     interpolationDecay === undefined ? {} : { 'interpolation-decay': String(interpolationDecay) }
 
@@ -107,12 +110,11 @@ export default function ModelViewer({
           alt={alt}
           loading="eager"
           reveal="auto"
-          camera-controls=""
-          disable-zoom=""
+          {...cam}
           {...rotate}
           {...decay}
-          auto-rotate-delay="1500"
-          rotation-per-second="18deg"
+          auto-rotate-delay={String(autoRotateDelay)}
+          rotation-per-second="22deg"
           touch-action="pan-y"
           shadow-intensity="1.2"
           shadow-softness="0.8"
