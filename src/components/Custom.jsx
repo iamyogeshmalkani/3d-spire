@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import ModelViewer, { mixLook, orbitBy, setLook } from './ModelViewer.jsx'
+import ModelViewer, { mixLook, orbitTo, setLook } from './ModelViewer.jsx'
 import { CLAY_LOOK, IDEA_IMAGE_URL, MODEL_LOOK, MODEL_URL } from '../config.js'
 import { useMedia, useScrollProgress } from '../hooks.js'
 import { smoothstep } from '../motion.js'
@@ -21,13 +21,19 @@ const KEYS = {
 const valuesFor = (p, keys) => {
   const mv = smoothstep(keys[0], keys[1], p) // 0 = idea image, 1 = model visible
   const t = smoothstep(keys[2], keys[3], p) // 0 = clay, 1 = finished stone
-  return { mv, t, stage: mv < 0.45 ? 'idea' : t < 0.45 ? 'clay' : 'final' }
+  // Exactly one full turn while the model is on screen (fade-in start → section end).
+  const turn = Math.min(1, Math.max(0, (p - keys[0]) / (1 - keys[0])))
+  return { mv, t, turn, stage: mv < 0.45 ? 'idea' : t < 0.45 ? 'clay' : 'final' }
 }
-const PRESET = { idea: { mv: 0, t: 0 }, clay: { mv: 1, t: 0 }, final: { mv: 1, t: 1 } }
+const PRESET = {
+  idea: { mv: 0, t: 0, turn: 0 },
+  clay: { mv: 1, t: 0, turn: 0.45 },
+  final: { mv: 1, t: 1, turn: 1 },
+}
 
 // Idea -> clay -> final. On wide screens with motion allowed the section is pinned and
 // scrolling runs the progression: a 2D reference photo gives way to the sculpt in matte
-// clay, which turns on its turntable and hardens into the finished stone look. On narrow
+// clay, which turns once with the scroll and hardens into the finished stone look. On narrow
 // screens the same progression is driven by the section passing through the viewport.
 // Under reduced motion the three stage buttons switch the view directly.
 export default function Custom() {
@@ -35,15 +41,17 @@ export default function Custom() {
   const wide = useMedia('(min-width: 900px)')
   const pinned = wide && !reduced
   const viewer = useRef(null)
-  const lastP = useRef(0)
   const last = useRef(reduced ? PRESET.final : PRESET.idea)
   const manual = useRef(false)
   const [stage, setStage] = useState(reduced ? 'final' : 'idea')
 
-  const paint = (el, { mv, t }) => {
-    last.current = { mv, t }
+  const paint = (el, { mv, t, turn = 0 }) => {
+    last.current = { mv, t, turn }
     const v = viewer.current
-    if (v?.loaded) setLook(v, mixLook(CLAY_LOOK, MODEL_LOOK, t))
+    if (v?.loaded) {
+      setLook(v, mixLook(CLAY_LOOK, MODEL_LOOK, t))
+      orbitTo(v, turn * 360)
+    }
     el?.style.setProperty('--mv', mv.toFixed(3))
     el?.style.setProperty('--t', t.toFixed(3))
     el?.style.setProperty('--sp', ((mv + t) / 2).toFixed(3))
@@ -53,11 +61,6 @@ export default function Custom() {
     if (manual.current) return
     const next = valuesFor(p, pinned ? KEYS.pin : KEYS.view)
     paint(el, next)
-    // Gentle turn only once the model is mostly visible — keeps idea→3D calm.
-    if (next.mv > 0.35) {
-      orbitBy(viewer.current, (p - lastP.current) * (pinned ? 90 : 50))
-    }
-    lastP.current = p
     if (el.dataset.stage !== next.stage) {
       el.dataset.stage = next.stage
       setStage(next.stage)
@@ -143,10 +146,11 @@ export default function Custom() {
             <ModelViewer
               className="viewer-custom"
               src={MODEL_URL}
-              alt="The same sculpt shown as a clay preview and as the finished model. Drag to rotate."
+              alt="The same sculpt shown as a clay preview and as the finished model. Scroll to turn once."
               look={reduced ? MODEL_LOOK : CLAY_LOOK}
               autoRotate={reduced}
               interactionPrompt="none"
+              interpolationDecay={0}
               placeholder={false}
               onViewer={onViewer}
             />

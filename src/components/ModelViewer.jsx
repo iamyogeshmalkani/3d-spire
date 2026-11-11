@@ -36,6 +36,13 @@ export function orbitBy(viewer, deg) {
   viewer.cameraOrbit = `${((o.theta * 180) / Math.PI + deg).toFixed(2)}deg ${o.phi.toFixed(4)}rad ${o.radius.toFixed(4)}m`
 }
 
+// Absolute yaw for scroll-scrubbed turns (one full rotation = thetaDeg 0 → 360).
+export function orbitTo(viewer, thetaDeg) {
+  if (!viewer?.loaded) return
+  const o = viewer.getCameraOrbit()
+  viewer.cameraOrbit = `${thetaDeg.toFixed(2)}deg ${o.phi.toFixed(4)}rad ${o.radius.toFixed(4)}m`
+}
+
 // Lazy 3D viewer: the library and the .glb are only fetched when the viewer is near the
 // viewport (or immediately when `eager` is set for above-the-fold use).
 export default function ModelViewer({
@@ -46,6 +53,8 @@ export default function ModelViewer({
   look = MODEL_LOOK,
   autoRotate = true,
   interactionPrompt = 'auto',
+  // 0 = snap camera orbit to scroll (no easing lag). Leave unset for default feel.
+  interpolationDecay,
   // Wireframe silhouette kept on until the .glb paints, so the stage never looks empty.
   placeholder = true,
   onViewer,
@@ -80,6 +89,8 @@ export default function ModelViewer({
   )
 
   const rotate = autoRotate ? { 'auto-rotate': '' } : {}
+  const decay =
+    interpolationDecay === undefined ? {} : { 'interpolation-decay': String(interpolationDecay) }
 
   return (
     <div ref={ref} className={`viewer ${className}${loaded ? ' is-ready' : ''}`}>
@@ -99,6 +110,7 @@ export default function ModelViewer({
           camera-controls=""
           disable-zoom=""
           {...rotate}
+          {...decay}
           auto-rotate-delay="1500"
           rotation-per-second="18deg"
           touch-action="pan-y"
