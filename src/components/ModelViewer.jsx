@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useInView } from '../hooks.js'
 import { ENVIRONMENT_URL, MODEL_LOOK } from '../config.js'
 import { lerp } from '../motion.js'
+import Wireframe from './Wireframe.jsx'
 
 let viewerLoad
 // Loads the <model-viewer> web component (and three.js) as a separate chunk, only once.
@@ -45,11 +46,14 @@ export default function ModelViewer({
   look = MODEL_LOOK,
   autoRotate = true,
   interactionPrompt = 'auto',
+  // Wireframe silhouette kept on until the .glb paints, so the stage never looks empty.
+  placeholder = true,
   onViewer,
   children,
 }) {
   const [ref, inView] = useInView('300px')
   const active = eager || inView
+  const [loaded, setLoaded] = useState(false)
   const onViewerRef = useRef(onViewer)
   onViewerRef.current = onViewer
 
@@ -61,7 +65,12 @@ export default function ModelViewer({
     (el) => {
       if (el) {
         setLook(el, look)
-        el.addEventListener('load', () => el.classList.add('is-loaded'), { once: true })
+        const mark = () => {
+          el.classList.add('is-loaded')
+          setLoaded(true)
+        }
+        if (el.loaded) mark()
+        else el.addEventListener('load', mark, { once: true })
       }
       onViewerRef.current?.(el)
     },
@@ -73,15 +82,22 @@ export default function ModelViewer({
   const rotate = autoRotate ? { 'auto-rotate': '' } : {}
 
   return (
-    <div ref={ref} className={`viewer ${className}`}>
+    <div ref={ref} className={`viewer ${className}${loaded ? ' is-ready' : ''}`}>
+      {placeholder && (
+        <div className="viewer-placeholder" aria-hidden="true">
+          <Wireframe seed={eager ? 3 : 4} />
+          <span className="viewer-placeholder-label">Loading sculpt…</span>
+        </div>
+      )}
       {active && (
         <model-viewer
           ref={viewerRef}
           src={src}
           alt={alt}
-          loading="lazy"
+          loading="eager"
           reveal="auto"
           camera-controls=""
+          disable-zoom=""
           {...rotate}
           auto-rotate-delay="1500"
           rotation-per-second="18deg"

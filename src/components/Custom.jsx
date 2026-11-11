@@ -131,6 +131,7 @@ export default function Custom() {
               look={reduced ? MODEL_LOOK : CLAY_LOOK}
               autoRotate={reduced}
               interactionPrompt="none"
+              placeholder={false}
               onViewer={onViewer}
             />
             <div className="stage-scrub" aria-hidden="true">

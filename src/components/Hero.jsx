@@ -48,7 +48,7 @@ export default function Hero() {
             alt="Interactive 3D sculpt by 3D Spire. Drag to rotate."
             onViewer={(el) => (viewer.current = el)}
           />
-          <p className="hint">Drag to rotate · Pinch or scroll to zoom</p>
+          <p className="hint">Drag to rotate</p>
         </div>
 
         <div className="scroll-cue" aria-hidden="true">
