@@ -43,6 +43,46 @@ export function orbitTo(viewer, thetaDeg) {
   viewer.cameraOrbit = `${thetaDeg.toFixed(2)}deg ${o.phi.toFixed(4)}rad ${o.radius.toFixed(4)}m`
 }
 
+function LoadingStage({ progress, eager }) {
+  const pct = Math.round(Math.min(1, Math.max(0, progress)) * 100)
+  const r = 42
+  const c = 2 * Math.PI * r
+  const dash = `${(pct / 100) * c} ${c}`
+
+  return (
+    <div className="viewer-placeholder" aria-hidden="true">
+      <div className="render-stage">
+        <div className="render-orbit">
+          <div className="render-figure">
+            <Wireframe seed={eager ? 3 : 4} />
+            <span className="render-scan" />
+          </div>
+        </div>
+        <svg className="render-ring" viewBox="0 0 100 100" aria-hidden="true">
+          <circle className="render-ring-track" cx="50" cy="50" r={r} />
+          <circle
+            className="render-ring-fill"
+            cx="50"
+            cy="50"
+            r={r}
+            style={{ strokeDasharray: dash }}
+          />
+        </svg>
+        <div className="render-plate" />
+      </div>
+      <div className="render-meta">
+        <span className="render-status">
+          {pct < 100 ? 'Rendering sculpt' : 'Almost ready'}
+        </span>
+        <span className="render-pct">{pct}%</span>
+      </div>
+      <div className="render-bar" role="presentation">
+        <span className="render-bar-fill" style={{ transform: `scaleX(${pct / 100})` }} />
+      </div>
+    </div>
+  )
+}
+
 // Lazy 3D viewer: the library and the .glb are only fetched when the viewer is near the
 // viewport (or immediately when `eager` is set for above-the-fold use).
 export default function ModelViewer({
@@ -57,7 +97,7 @@ export default function ModelViewer({
   interactionPrompt = 'auto',
   // 0 = snap camera orbit to scroll (no easing lag). Leave unset for default feel.
   interpolationDecay,
-  // Wireframe silhouette kept on until the .glb paints, so the stage never looks empty.
+  // Animated render stage kept on until the .glb paints.
   placeholder = true,
   onViewer,
   children,
@@ -65,6 +105,7 @@ export default function ModelViewer({
   const [ref, inView] = useInView('300px')
   const active = eager || inView
   const [loaded, setLoaded] = useState(false)
+  const [progress, setProgress] = useState(0.04)
   const onViewerRef = useRef(onViewer)
   onViewerRef.current = onViewer
 
@@ -72,14 +113,31 @@ export default function ModelViewer({
     if (active) loadViewer()
   }, [active])
 
+  // Soft crawl so the ring never sits frozen before the first progress event.
+  useEffect(() => {
+    if (!active || loaded) return
+    const id = window.setInterval(() => {
+      setProgress((p) => (p < 0.12 ? p + 0.008 : p))
+    }, 120)
+    return () => window.clearInterval(id)
+  }, [active, loaded])
+
   const viewerRef = useCallback(
     (el) => {
       if (el) {
         setLook(el, look)
+        const onProgress = (e) => {
+          const next = e.detail?.totalProgress
+          if (typeof next === 'number') {
+            setProgress((p) => Math.max(p, next))
+          }
+        }
         const mark = () => {
           el.classList.add('is-loaded')
+          setProgress(1)
           setLoaded(true)
         }
+        el.addEventListener('progress', onProgress)
         if (el.loaded) mark()
         else el.addEventListener('load', mark, { once: true })
       }
@@ -96,13 +154,12 @@ export default function ModelViewer({
     interpolationDecay === undefined ? {} : { 'interpolation-decay': String(interpolationDecay) }
 
   return (
-    <div ref={ref} className={`viewer ${className}${loaded ? ' is-ready' : ''}`}>
-      {placeholder && (
-        <div className="viewer-placeholder" aria-hidden="true">
-          <Wireframe seed={eager ? 3 : 4} />
-          <span className="viewer-placeholder-label">Loading sculpt…</span>
-        </div>
-      )}
+    <div
+      ref={ref}
+      className={`viewer ${className}${loaded ? ' is-ready' : ' is-rendering'}`}
+      aria-busy={!loaded}
+    >
+      {placeholder && <LoadingStage progress={progress} eager={eager} />}
       {active && (
         <model-viewer
           ref={viewerRef}

@@ -3,7 +3,7 @@ import ModelViewer from './ModelViewer.jsx'
 
 const TITLE = ['Any idea.', 'Any reference.', 'Sculpted in 3D.']
 
-// Hero stage: auto-rotating sculpt, no drag controls — faster to load and doesn't fight scroll.
+// Hero stage: interactive sculpt with a visible render-progress state while the GLB boots.
 export default function Hero() {
   return (
     <section id="top" className="hero" aria-labelledby="hero-title">
@@ -34,12 +34,13 @@ export default function Hero() {
             eager
             className="viewer-hero"
             src={MODEL_URL}
-            alt="3D sculpt by 3D Spire, slowly rotating."
-            controls={false}
+            alt="Interactive 3D sculpt by 3D Spire. Drag to rotate."
+            controls
             autoRotate
-            interactionPrompt="none"
-            autoRotateDelay={0}
+            interactionPrompt="auto"
+            autoRotateDelay={800}
           />
+          <p className="hint">Drag to rotate</p>
         </div>
 
         <div className="scroll-cue" aria-hidden="true">
