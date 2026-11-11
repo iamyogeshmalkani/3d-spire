@@ -297,7 +297,7 @@ html:not(.motion) .ticker-list li:last-child::after { display: none; }
 }
 .card { position: relative; overflow: clip; aspect-ratio: 3 / 4; border-radius: 20px; border: 1px solid var(--border); background: linear-gradient(180deg, var(--surface-2), var(--surface)); transition: border-color 0.4s; }
 .card:hover { border-color: var(--border-strong); }
-.card-gif {
+.card-still {
   position: absolute;
   inset: 0;
   width: 100%;

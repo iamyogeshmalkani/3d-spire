@@ -19,31 +19,31 @@ export const MODEL_URL = asset('shiva-drinking-poison.glb')
 // 2D reference shown as the "idea" stage before the sculpt fades in.
 export const IDEA_IMAGE_URL = asset('idea-reference.jpg')
 
-// Ready-made collection shown on the site (compressed GLBs + turntable GIFs in /public).
+// Ready-made collection shown on the site (compressed GLBs + front stills in /public).
 export const COLLECTION = [
   {
     id: 'shiva-drinking-poison',
     name: 'Shiva drinking poison',
     src: asset('shiva-drinking-poison.glb'),
-    preview: asset('previews/shiva-drinking-poison.gif'),
+    preview: asset('previews/shiva-drinking-poison.jpg'),
   },
   {
     id: 'hanuman-body',
     name: 'Hanuman',
     src: asset('hanuman-body.glb'),
-    preview: asset('previews/hanuman-body.gif'),
+    preview: asset('previews/hanuman-body.jpg'),
   },
   {
     id: 'narsingh',
     name: 'Narsingh',
     src: asset('narsingh.glb'),
-    preview: asset('previews/narsingh.gif'),
+    preview: asset('previews/narsingh.jpg'),
   },
   {
     id: 'neem-karoli-baba',
     name: 'Neem Karoli Baba',
     src: asset('neem-karoli-baba.glb'),
-    preview: asset('previews/neem-karoli-baba.gif'),
+    preview: asset('previews/neem-karoli-baba.jpg'),
   },
 ]
 

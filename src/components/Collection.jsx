@@ -1,5 +1,5 @@
 import { Suspense, lazy, useEffect, useId, useState } from 'react'
-import { CATALOGUE_LINK, COLLECTION } from '../config.js'
+import { CATALOGUE_LINK, COLLECTION, MODEL_LOOK } from '../config.js'
 
 const ModelViewer = lazy(() => import('./ModelViewer.jsx'))
 
@@ -39,6 +39,8 @@ function TryModal({ model, onClose }) {
               className="viewer-try3d"
               src={model.src}
               alt={`${model.name}. Drag to rotate.`}
+              // Same studio light map + stone material as the hero Shiva sculpt.
+              look={MODEL_LOOK}
               controls
               autoRotate
               autoRotateDelay={600}
@@ -70,11 +72,11 @@ export default function Collection() {
             style={i ? { '--d': `${(i * 0.1).toFixed(2)}s` } : undefined}
           >
             <img
-              className="card-gif"
+              className="card-still"
               src={model.preview}
-              alt={`${model.name} rotating preview`}
-              width="420"
-              height="520"
+              alt={`${model.name} front view`}
+              width="720"
+              height="900"
               loading="lazy"
               decoding="async"
             />
