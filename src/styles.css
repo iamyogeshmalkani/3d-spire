@@ -250,9 +250,10 @@ html:not(.motion) .ticker-list li:last-child::after { display: none; }
 
 /* ---------- custom commissions: idea -> clay -> final ---------- */
 :root { --custom-min: 760px; }
-@media (min-width: 900px) and (prefers-reduced-motion: no-preference) { :root { --custom-min: 340vh; } }
+/* Taller pin = more scroll distance so idea → 3D eases in instead of snapping. */
+@media (min-width: 900px) and (prefers-reduced-motion: no-preference) { :root { --custom-min: 460vh; } }
 .custom { position: relative; }
-.custom.is-pinned { height: 340vh; }
+.custom.is-pinned { height: 460vh; }
 .custom-sticky { padding-top: var(--section-pad, clamp(100px, 12vw, 170px)); }
 .custom.is-pinned .custom-sticky { position: sticky; top: 0; min-height: 100svh; display: flex; align-items: center; padding: calc(var(--nav-h) + 16px) 0 32px; }
 .custom-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 36px; align-items: center; width: 100%; }
@@ -272,9 +273,59 @@ html:not(.motion) .ticker-list li:last-child::after { display: none; }
 .stage[aria-pressed='true'] .stage-num { color: var(--accent); }
 
 .custom-stage { position: relative; height: clamp(360px, 90vw, 560px); }
-.custom-stage .viewer-custom { opacity: var(--mv, 1); }
-.custom-sketch { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; opacity: calc(1 - var(--mv, 1)); transform: scale(calc(1 - var(--mv, 1) * 0.08)); }
-.custom-sketch .wire { width: min(62%, 360px); height: 84%; overflow: visible; }
+.custom-stage .viewer-custom {
+  opacity: var(--mv, 1);
+  transform: scale(calc(0.92 + var(--mv, 1) * 0.08));
+  filter: blur(calc((1 - var(--mv, 1)) * 8px));
+  transition: none;
+  will-change: opacity, transform, filter;
+}
+/* 2D reference photo = the "idea". Holds until --mv rises, then soft-fades into the sculpt. */
+.custom-idea {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  opacity: calc(1 - var(--mv, 1));
+  transform: scale(calc(1 - var(--mv, 1) * 0.06)) translateY(calc(var(--mv, 1) * -12px));
+  filter: blur(calc(var(--mv, 1) * 6px));
+}
+.idea-frame {
+  position: relative;
+  width: min(72%, 360px);
+  aspect-ratio: 505 / 900;
+  margin: 0;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(242, 242, 236, 0.12);
+  background: var(--surface);
+  box-shadow:
+    0 28px 60px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(166, 209, 43, 0.08);
+  transform: rotate(-2.5deg);
+}
+.idea-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 18%;
+}
+.idea-caption {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(14, 15, 10, 0.72);
+  border: 1px solid rgba(166, 209, 43, 0.28);
+  color: var(--accent);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
 .stage-glow-custom { background: radial-gradient(closest-side, rgba(166, 209, 43, calc(0.06 + var(--sp, 0) * 0.26)), rgba(166, 209, 43, 0.05) 42%, transparent 70%); }
 .stage-scrub { position: absolute; left: 0; right: 0; bottom: -30px; display: flex; align-items: center; justify-content: center; gap: 14px; font-size: 12px; letter-spacing: 0.06em; color: var(--dim); }
 .scrub-track { position: relative; width: clamp(100px, 20vw, 180px); height: 1px; background: var(--border-strong); }

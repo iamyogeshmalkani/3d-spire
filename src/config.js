@@ -14,6 +14,8 @@ export const INSTAGRAM_LINK = 'https://www.instagram.com/3d_spire'
 
 // Served from /public, so it must respect Vite's base path.
 export const MODEL_URL = `${import.meta.env.BASE_URL}shiva-drinking-poison.glb`
+// 2D reference shown as the "idea" stage before the sculpt fades in.
+export const IDEA_IMAGE_URL = `${import.meta.env.BASE_URL}idea-reference.jpg`
 
 // Lighting + material so the sculpt's form reads clearly on the dark background.
 // The source .glb is a single flat light-grey material, which blows out to pure white

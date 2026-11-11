@@ -1,7 +1,6 @@
 import { useRef, useState } from 'react'
 import ModelViewer, { mixLook, orbitBy, setLook } from './ModelViewer.jsx'
-import Wireframe from './Wireframe.jsx'
-import { CLAY_LOOK, MODEL_LOOK, MODEL_URL } from '../config.js'
+import { CLAY_LOOK, IDEA_IMAGE_URL, MODEL_LOOK, MODEL_URL } from '../config.js'
 import { useMedia, useScrollProgress } from '../hooks.js'
 import { smoothstep } from '../motion.js'
 
@@ -11,19 +10,23 @@ const STAGES = [
   ['final', '03', 'Final detail', 'Fine surface detail, ready to print or present.'],
 ]
 
-// Where each transition happens along the section's progress (0..1):
-// [sketch -> model fade start, end, clay -> final start, end].
-const KEYS = { pin: [0.2, 0.38, 0.5, 0.78], view: [0.24, 0.38, 0.44, 0.62] }
+// Progress keys along the pinned section (0..1):
+// [idea→model fade start, fade end, clay→final start, clay→final end].
+// Kept wide so the 3D model eases in slowly instead of snapping on.
+const KEYS = {
+  pin: [0.18, 0.55, 0.58, 0.9],
+  view: [0.18, 0.48, 0.5, 0.78],
+}
 
 const valuesFor = (p, keys) => {
-  const mv = smoothstep(keys[0], keys[1], p) // 0 = sketch only, 1 = model visible
+  const mv = smoothstep(keys[0], keys[1], p) // 0 = idea image, 1 = model visible
   const t = smoothstep(keys[2], keys[3], p) // 0 = clay, 1 = finished stone
-  return { mv, t, stage: mv < 0.5 ? 'idea' : t < 0.5 ? 'clay' : 'final' }
+  return { mv, t, stage: mv < 0.45 ? 'idea' : t < 0.45 ? 'clay' : 'final' }
 }
 const PRESET = { idea: { mv: 0, t: 0 }, clay: { mv: 1, t: 0 }, final: { mv: 1, t: 1 } }
 
 // Idea -> clay -> final. On wide screens with motion allowed the section is pinned and
-// scrolling runs the progression: a wireframe "idea" gives way to the sculpt in matte
+// scrolling runs the progression: a 2D reference photo gives way to the sculpt in matte
 // clay, which turns on its turntable and hardens into the finished stone look. On narrow
 // screens the same progression is driven by the section passing through the viewport.
 // Under reduced motion the three stage buttons switch the view directly.
@@ -50,7 +53,10 @@ export default function Custom() {
     if (manual.current) return
     const next = valuesFor(p, pinned ? KEYS.pin : KEYS.view)
     paint(el, next)
-    orbitBy(viewer.current, (p - lastP.current) * (pinned ? 240 : 120))
+    // Gentle turn only once the model is mostly visible — keeps idea→3D calm.
+    if (next.mv > 0.35) {
+      orbitBy(viewer.current, (p - lastP.current) * (pinned ? 90 : 50))
+    }
     lastP.current = p
     if (el.dataset.stage !== next.stage) {
       el.dataset.stage = next.stage
@@ -71,7 +77,7 @@ export default function Custom() {
       const el = ref.current
       const travel = el.offsetHeight - window.innerHeight
       const top = el.getBoundingClientRect().top + window.scrollY
-      const at = { idea: 0.06, clay: 0.44, final: 0.92 }[key]
+      const at = { idea: 0.08, clay: 0.56, final: 0.94 }[key]
       window.scrollTo({ top: top + travel * at, behavior: 'smooth' })
       return
     }
@@ -121,8 +127,18 @@ export default function Custom() {
 
           <div className="custom-stage">
             <div className="stage-glow stage-glow-custom" aria-hidden="true" />
-            <div className="custom-sketch" aria-hidden="true">
-              <Wireframe seed={2} />
+            <div className="custom-idea" aria-hidden="true">
+              <figure className="idea-frame">
+                <img
+                  src={IDEA_IMAGE_URL}
+                  alt=""
+                  width="505"
+                  height="900"
+                  decoding="async"
+                  fetchPriority="low"
+                />
+                <figcaption className="idea-caption">Reference</figcaption>
+              </figure>
             </div>
             <ModelViewer
               className="viewer-custom"
