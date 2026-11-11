@@ -297,8 +297,34 @@ html:not(.motion) .ticker-list li:last-child::after { display: none; }
 }
 .card { position: relative; overflow: clip; aspect-ratio: 3 / 4; border-radius: 20px; border: 1px solid var(--border); background: linear-gradient(180deg, var(--surface-2), var(--surface)); transition: border-color 0.4s; }
 .card:hover { border-color: var(--border-strong); }
+.card-gif {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+  background: #0a0b08;
+}
 .card-viewer { position: absolute; inset: 0; }
-.card-caption { position: absolute; left: 0; right: 0; bottom: 0; padding: 48px 24px 20px; color: var(--muted); font-size: 14px; background: linear-gradient(transparent, rgba(14, 15, 10, 0.9)); pointer-events: none; }
+.card-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 48px 20px 18px;
+  color: var(--muted);
+  font-size: 14px;
+  background: linear-gradient(transparent, rgba(14, 15, 10, 0.92));
+  pointer-events: none;
+}
+.card-cta { pointer-events: auto; }
 .card-tag { position: absolute; top: 18px; left: 18px; padding: 7px 12px; border-radius: 999px; border: 1px solid rgba(166, 209, 43, 0.28); background: rgba(14, 15, 10, 0.6); color: var(--accent); font-size: 12px; font-weight: 500; line-height: 1; }
 .card-soon .wire { position: absolute; left: 50%; top: 50%; width: 62%; height: 72%; transform: translate(-50%, -52%); overflow: visible; }
 .wire-ring, .wire-line, .wire-axis, .wire-base { fill: none; stroke: var(--accent); vector-effect: non-scaling-stroke; }
@@ -310,20 +336,54 @@ html:not(.motion) .ticker-list li:last-child::after { display: none; }
 .motion .wire-line { stroke-dasharray: 6 5; animation: dash 20s linear infinite reverse; }
 .collection-foot { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 32px; margin-top: 28px; }
 
+/* Try 3D lightbox — interactive viewer only opens on demand. */
+.try3d { position: fixed; inset: 0; z-index: 120; display: grid; place-items: center; padding: 24px; }
+.try3d-backdrop { position: absolute; inset: 0; border: 0; background: rgba(8, 9, 6, 0.78); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); cursor: pointer; }
+.try3d-panel {
+  position: relative;
+  z-index: 1;
+  width: min(920px, 100%);
+  max-height: min(92svh, 900px);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 12px;
+  padding: 18px;
+  border-radius: 24px;
+  border: 1px solid var(--border-strong);
+  background: linear-gradient(180deg, #16180f, #0e0f0a);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+}
+.try3d-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.try3d-title { margin: 4px 0 0; font-family: var(--font-display); font-weight: 300; font-size: clamp(24px, 4vw, 34px); letter-spacing: -0.02em; }
+.try3d-stage { position: relative; min-height: min(62svh, 640px); border-radius: 18px; overflow: hidden; background: #0a0b08; }
+.viewer-try3d { position: absolute; inset: 0; background: transparent; border: 0; border-radius: 0; overflow: visible; }
+.viewer-try3d model-viewer { opacity: 0; transition: opacity 0.8s ease; }
+.viewer-try3d model-viewer.is-loaded { opacity: 1; }
+.try3d-stage .hint { bottom: 14px; }
+
 @media (max-width: 900px) {
   .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 560px) {
   .cards { grid-template-columns: 1fr; gap: 16px; }
   .card { aspect-ratio: 4 / 5; }
+  .try3d { padding: 12px; }
+  .try3d-panel { padding: 12px; border-radius: 18px; }
+  .try3d-stage { min-height: 58svh; }
 }
 
 /* ---------- custom commissions: idea -> clay -> final ---------- */
 :root { --custom-min: 760px; }
 /* Tall pin so the sculpt can finish one full scroll-driven turn before the section ends. */
 @media (min-width: 900px) and (prefers-reduced-motion: no-preference) { :root { --custom-min: 640vh; } }
+/* On mobile the section isn't pinned — give it more height so the idea reference can be seen. */
+@media (max-width: 899px) { :root { --custom-min: 220vh; } }
 .custom { position: relative; }
 .custom.is-pinned { height: 640vh; }
+@media (max-width: 899px) {
+  .custom { min-height: 220vh; }
+  .custom-sticky { position: sticky; top: var(--nav-h); padding-top: 24px; padding-bottom: 24px; }
+}
 .custom-sticky { padding-top: var(--section-pad, clamp(100px, 12vw, 170px)); }
 .custom.is-pinned .custom-sticky { position: sticky; top: 0; min-height: 100svh; display: flex; align-items: center; padding: calc(var(--nav-h) + 16px) 0 32px; }
 .custom-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 36px; align-items: center; width: 100%; }

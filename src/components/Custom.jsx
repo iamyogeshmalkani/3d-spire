@@ -15,10 +15,12 @@ const STAGES = [
 // Idea fades in earlier so most of the long pin is spent turning the sculpt once.
 const KEYS = {
   pin: [0.1, 0.28, 0.52, 0.86],
-  view: [0.14, 0.38, 0.48, 0.78],
+  // Mobile/narrow: hold the reference image much longer — parallax used to start too early
+  // and the idea frame was gone before people noticed it.
+  view: [0.42, 0.62, 0.68, 0.9],
 }
 // Full 360° is mapped across this window (after the model is mostly visible → near end).
-const TURN = { pin: [0.26, 0.9], view: [0.32, 0.88] }
+const TURN = { pin: [0.26, 0.9], view: [0.58, 0.95] }
 
 const valuesFor = (p, keys, turnKeys) => {
   const mv = smoothstep(keys[0], keys[1], p) // 0 = idea image, 1 = model visible
